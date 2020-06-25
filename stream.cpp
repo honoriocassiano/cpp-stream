@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <algorithm>
 
+namespace stream {
 // Stream class
 template <typename Value>
 class Stream {
@@ -29,6 +30,7 @@ auto of(T iterable) {
 
     return Stream<Value>(initializer);
 }
+}
 
 // Utility classes
 
@@ -36,7 +38,7 @@ int main(void) {
 
     std::vector<int> vec{1, 2, 3};
 
-    auto stream = of(vec);
+    auto stream = stream::of(vec);
     
     return 0;
 }
