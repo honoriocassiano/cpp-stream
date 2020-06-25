@@ -3,32 +3,46 @@
 #include <vector>
 #include <type_traits>
 #include <algorithm>
+#include <functional>
 
 namespace stream {
 // Stream class
-template <typename Value>
+template <typename Type>
 class Stream {
 
 public:
-    Stream(std::vector<Value> values) : values(values) {}
+    Stream(std::vector<Type> values) : values(values) {}
 
     ~Stream() {}
 
+    template <typename NewType>
+    auto map(std::function<NewType(Type)> mapper) {
+        std::vector<NewType> newValues;
+
+        newValues.reserve(values.size());
+
+        for (auto it = values.begin(); it != values.end(); it++) {
+            newValues.push_back(mapper(*it));
+        }
+
+        return Stream<NewType>(newValues);
+    }
+
 private:
-    std::vector<Value> values;
+    std::vector<Type> values;
 };
 
 // Utility templates
 template <typename T, typename = std::void_t<decltype(std::begin(std::declval<T>())), decltype(std::end(std::declval<T>()))>>
 auto of(T iterable) {
 
-    typedef typename std::remove_reference<decltype(*std::begin(iterable))>::type Value;
+    typedef typename std::remove_reference<decltype(*std::begin(iterable))>::type Type;
 
-    std::vector<Value> initializer;
+    std::vector<Type> initializer;
 
     initializer.insert(initializer.end(), std::begin(iterable), std::end(iterable));
 
-    return Stream<Value>(initializer);
+    return Stream<Type>(initializer);
 }
 }
 
@@ -39,6 +53,8 @@ int main(void) {
     std::vector<int> vec{1, 2, 3};
 
     auto stream = stream::of(vec);
+
+    auto stream2 = stream.map<float>([] (int value) -> float { return float(value); });
     
     return 0;
 }
