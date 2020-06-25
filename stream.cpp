@@ -6,6 +6,7 @@
 #include <functional>
 
 namespace stream {
+
 // Stream class
 template <typename Type>
 class Stream {
@@ -15,8 +16,11 @@ public:
 
     ~Stream() {}
 
-    template <typename NewType>
-    auto map(std::function<NewType(Type)> mapper) {
+    template <typename Mapper>
+    auto map(Mapper mapper) {
+        
+        typedef typename std::result_of<Mapper(Type)>::type NewType;
+
         std::vector<NewType> newValues;
 
         newValues.reserve(values.size());
@@ -54,7 +58,7 @@ int main(void) {
 
     auto stream = stream::of(vec);
 
-    auto stream2 = stream.map<float>([] (int value) -> float { return float(value); });
+    auto stream2 = stream.map([] (int value) -> float { return float(value); });
     
     return 0;
 }
