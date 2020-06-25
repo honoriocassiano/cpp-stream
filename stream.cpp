@@ -32,6 +32,18 @@ public:
         return Stream<NewType>(newValues);
     }
 
+    auto filter(const std::function<bool(Type)>& func) {
+        std::vector<Type> newValues;
+
+        for (auto it = values.begin(); it != values.end(); it++) {
+            if (func(*it)) {
+                newValues.push_back(*it);
+            }
+        }
+
+        return Stream<Type>(newValues);
+    }
+
 private:
     std::vector<Type> values;
 };
@@ -58,7 +70,9 @@ int main(void) {
 
     auto stream = stream::of(vec);
 
-    auto stream2 = stream.map([] (int value) -> float { return float(value); });
+    auto stream2 = stream.filter([] (int n) -> bool { return n > 2; });
+
+    // auto stream2 = stream.map([] (int value) -> float { return float(value); });
     
     return 0;
 }
