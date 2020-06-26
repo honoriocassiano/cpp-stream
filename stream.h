@@ -44,7 +44,7 @@ public:
     }
 
     template <typename Collector>
-    auto collect(Collector &&collector) const {
+    auto collect(Collector &&collector) {
 
         for (auto it = values.begin(); it != values.end(); it++) {
             collector << *it;
