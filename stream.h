@@ -31,7 +31,7 @@ public:
     }
 
     template <typename Filter, typename = std::enable_if<std::is_same<bool, typename std::invoke_result<Filter, Type>::type>::value>>
-    auto filter(Filter func) {
+    auto filter(Filter &&func) {
 
         std::vector<Type> newValues;
 
