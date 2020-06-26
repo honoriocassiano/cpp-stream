@@ -30,8 +30,9 @@ public:
         return Stream<NewType>(newValues);
     }
 
-    template <typename Filter, typename = std::void_t<std::is_same<bool, decltype(std::declval<Filter>()())>>>
-    auto filter(Filter &&func) {
+    template <typename Filter, typename = std::enable_if<std::is_same<bool, typename std::invoke_result<Filter, Type>::type>::value>>
+    auto filter(Filter func) {
+
         std::vector<Type> newValues;
 
         for (auto it = values.begin(); it != values.end(); it++) {
