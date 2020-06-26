@@ -10,12 +10,12 @@ template <typename Type>
 class Stream {
 
 public:
-    Stream(std::vector<Type> values) : values(values) {}
+    Stream(const std::vector<Type>& values) : values(values) {}
 
     virtual ~Stream() {}
 
     template <typename Mapper>
-    auto map(Mapper mapper) {
+    auto map(Mapper &&mapper) {
 
         typedef typename std::result_of<Mapper(Type)>::type NewType;
 
