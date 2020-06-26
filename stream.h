@@ -14,34 +14,52 @@ public:
 
     virtual ~Stream() {}
 
+private:
+    template <typename BuilderType>
+    class Builder {
+        public:
+            Builder() {}
+            virtual ~Builder() {}
+
+            Builder<BuilderType> operator<<(const BuilderType& type) {
+                values.push_back(type);
+
+                return *this;
+            }
+
+            Stream<BuilderType> build() {
+                return Stream<BuilderType>(std::move(values));
+            }
+
+        private:
+            std::vector<BuilderType> values;
+    };
+
+public:
     template <typename Mapper>
     auto map(Mapper &&mapper) {
 
         typedef typename std::result_of<Mapper(Type)>::type NewType;
 
-        std::vector<NewType> newValues;
+        Builder<NewType> builder;
 
-        newValues.reserve(values.size());
-
-        for (auto it = values.begin(); it != values.end(); it++) {
-            newValues.push_back(mapper(*it));
+        for (const auto &value : values) {
+            builder << values;
         }
 
-        return Stream<NewType>(newValues);
+        return builder.build();
     }
 
     template <typename Filter, typename = std::enable_if<std::is_same<bool, typename std::invoke_result<Filter, Type>::type>::value>>
     auto filter(Filter &&func) {
 
-        std::vector<Type> newValues;
+        Builder<Type> builder;
 
-        for (auto it = values.begin(); it != values.end(); it++) {
-            if (func(*it)) {
-                newValues.push_back(*it);
-            }
+        for (const auto& value: values) {
+            if (func(value)) builder << value;
         }
 
-        return Stream<Type>(newValues);
+        return builder.build();
     }
 
     std::size_t count() const {
