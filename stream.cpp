@@ -32,7 +32,7 @@ public:
         return Stream<NewType>(newValues);
     }
 
-    auto filter(const std::function<bool(Type)>& func) {
+    auto filter(const std::function<bool(Type)> &func) {
         std::vector<Type> newValues;
 
         for (auto it = values.begin(); it != values.end(); it++) {
@@ -45,13 +45,13 @@ public:
     }
 
     template <typename Collector>
-    auto collect(Collector collector) const {
+    auto collect(Collector &&collector) const {
 
         for (auto it = values.begin(); it != values.end(); it++) {
-            collector.consume(*it);
+            collector << *it;
         }
 
-        return collector.finish();
+        return *collector;
     }
 
 private:
@@ -72,29 +72,17 @@ auto of(T iterable) {
 }
 
 // Utility classes
-template <typename T>
-class Collector {
-
-    typedef decltype(*std::begin(std::declval<T>())) ValueType;
-
-public:
-    Collector() {}
-    virtual ~Collector() {}
-
-    void consume(const ValueType& value) {}
-
-    T finish() {}
-};
-
 template <typename ValueType>
-class VectorCollector : public Collector<std::vector<ValueType>> {
+class VectorCollector {
 
 public:
-    void consume(const ValueType& value) {
+    VectorCollector<ValueType>& operator<<(const ValueType& value) {
         values.push_back(value);
+
+        return *this;
     }
 
-    auto finish() {
+    std::vector<ValueType> operator*() {
         return values;
     }
 
@@ -111,9 +99,7 @@ int main(void) {
 
     auto stream = stream::of(vec).map([](int value) -> float { return value * 1.2f; });
 
-    auto collector = stream::VectorCollector<float>();
-
-    auto values = stream.collect(collector);
+    auto values = stream.collect(stream::VectorCollector<float>());
 
     // auto stream2 = stream.filter([] (int n) -> bool { return n > 2; });
     // auto stream2 = stream.map([] (int value) -> float { return float(value); });
