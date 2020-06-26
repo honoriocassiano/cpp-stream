@@ -44,6 +44,10 @@ public:
         return Stream<Type>(newValues);
     }
 
+    std::size_t count() const {
+        return values.size();
+    }
+
     template <typename Collector>
     auto collect(Collector &&collector) {
 
