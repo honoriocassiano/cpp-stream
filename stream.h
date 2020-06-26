@@ -12,7 +12,7 @@ class Stream {
 public:
     Stream(std::vector<Type> values) : values(values) {}
 
-    ~Stream() {}
+    virtual ~Stream() {}
 
     template <typename Mapper>
     auto map(Mapper mapper) {
