@@ -32,7 +32,8 @@ public:
         return Stream<NewType>(newValues);
     }
 
-    auto filter(const std::function<bool(Type)> &func) {
+    template <typename Filter, typename = std::void_t<std::is_same<bool, decltype(std::declval<Filter>()())>>>
+    auto filter(Filter &func) {
         std::vector<Type> newValues;
 
         for (auto it = values.begin(); it != values.end(); it++) {
